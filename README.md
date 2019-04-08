@@ -2,7 +2,7 @@
 
 ## Content
 | Week  | Topic  | Assignment |
-|---|---|---|---|
+|---|---|---|
 | 1  | [Regression](1_regression)                          |   |
 | 2  | [Classification](2_classification)                  |   |
 | 3  | Neural Network &  Deep Learning     |   |
