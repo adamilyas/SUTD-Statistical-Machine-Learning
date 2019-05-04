@@ -1,0 +1,140 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+from numpy import linalg as LA
+from matplotlib.patches import Ellipse
+from sklearn.datasets.samples_generator import make_blobs
+from scipy.stats import multivariate_normal
+
+def initialize(X):
+    N, d = X.shape
+    MEANS = np.random.rand(K,2)
+    COVARIANCES = np.array([np.eye(N=d) for _ in range(3)])
+    CLUSTER_COEFFICIENTS = np.random.uniform(size=(K))
+
+    print(f"Means: \n{MEANS}\n")
+    print(f"Covariance Matrix: \n{COVARIANCES}\n")
+    print(f"Cluster Coefficient (pi): \n{CLUSTER_COEFFICIENTS}")
+    return MEANS, COVARIANCES, CLUSTER_COEFFICIENTS
+
+def multivariate_gaussian_pdf(x, mu, sigma):
+    D = x.shape[0]
+    exp_term = np.exp(-0.5*(x - mu).T@np.linalg.inv(sigma)@(x - mu))
+    a = 1/ (np.sqrt(2*np.pi)**D)
+    b = 1/np.sqrt(LA.det(sigma))
+    return a*b*exp_term
+
+def calc_gamma(x, cluster_idx):
+    mu = MEANS[cluster_idx]
+    sigma = COVARIANCES[cluster_idx]
+    pi_k = CLUSTER_COEFFICIENTS[cluster_idx]
+    gamma =  pi_k*multivariate_gaussian_pdf(x, mu, sigma) / sum([CLUSTER_COEFFICIENTS[cluster_j]*multivariate_gaussian_pdf(x, MEANS[cluster_j], COVARIANCES[cluster_j]) 
+     for cluster_j in range(K)])
+    return gamma
+
+def E_step():
+    gamma = np.zeros((NUM_DATAPTS, K))
+    for i in range(NUM_DATAPTS):
+        x = X[i]
+        for cluster_idx in range(K):
+            current_gamma = calc_gamma(x, cluster_idx)
+            gamma[i, cluster_idx] = current_gamma
+    return gamma
+
+def M_step(gamma):
+    N_effect = [sum([gamma[i, cluster_j] for i in range(NUM_DATAPTS)]) for cluster_j in range(K)]
+    
+    mu_new = np.array([
+        (1/N_effect[cluster_idx]) * sum([gamma[i, cluster_idx]*X[i] for i in range(NUM_DATAPTS)])
+              for cluster_idx in range(K)])
+    
+    sigma_new = []
+    for cluster_idx in range(K):
+        mean = MEANS[cluster_idx]
+        
+        sigma_new_k = 0
+        for i in range(NUM_DATAPTS):
+            x = X[i]
+            x_minus_mu = (x - mean).reshape(-1,1)
+            sigma_new_k += gamma[i, cluster_idx]*x_minus_mu@(x_minus_mu.T)
+        sigma_new.append(1/N_effect[cluster_idx] * sigma_new_k)
+    sigma_new = np.array(sigma_new)
+
+    cluster_coef_new = [N_k/NUM_DATAPTS for N_k in N_effect]
+    
+    return mu_new, sigma_new, cluster_coef_new
+
+def log_likelihood(X, mu, sigma, cluster_coef):
+    ll = 0
+    for i in range(NUM_DATAPTS):
+        x = X[i]
+        ll_i = 0
+        for cluster_idx in range(K):
+            ll_i += cluster_coef[cluster_idx]*multivariate_gaussian_pdf(x, mu[cluster_idx], sigma[cluster_idx])
+        ll += np.log(ll_i)
+    return ll
+
+def EM_clustering(X, max_iter=40, display=False):
+    MEANS, COVARIANCES, CLUSTER_COEFFICIENTS = initialize(X)
+    max_iter = 50;
+    prev_ll = -np.inf
+    for _ in range(max_iter):
+        gamma = E_step()
+        MEANS, COVARIANCES, CLUSTER_COEFFICIENTS = M_step(gamma)
+        ll = log_likelihood(X, MEANS, COVARIANCES, CLUSTER_COEFFICIENTS)
+        print(ll)
+        plot_result(X, gamma)
+        # check if converges
+        #if ll - prev_ll < 0.001:
+        #    return gamma
+        #else:
+        #    prev_ll = ll
+    return gamma
+
+def predict(gamma):
+    return [np.argmax(el) for el in gamma]
+
+def plot_result(X, gamma=None):
+    ax = plt.subplot(111, aspect='equal')
+    ax.set_xlim([-5,5])
+    ax.set_ylim([-5,5])
+    ax.scatter(X[:, 0], X[:, 1], c=gamma, s=50, cmap=None)
+    
+    for k in range(K):
+        l, v = LA.eig(COVARIANCES[k])
+        theta = np.arctan(v[1,0]/v[0,0])
+        e = Ellipse((MEANS[k,0],MEANS[k,1]),6*l[0],6*l[1],
+                    theta*180/np.pi)
+        e.set_alpha(0.5)
+        ax.add_artist(e)
+    plt.show()
+    
+if __name__ == "__main__":
+    # init datasets
+    K = 3
+    NUM_DATAPTS = 150
+
+    X,y = make_blobs(n_samples=NUM_DATAPTS, 
+                     centers=K,shuffle=False, 
+                     random_state=0,
+                     cluster_std=0.6)
+
+    g1 = np.asarray([[2.0,0],[-0.9,1]])
+    g2 = np.asarray([[1.4,0],[0.5,0.7]])
+
+    mean1 = np.mean(X[:int(NUM_DATAPTS/K)])
+    mean2 = np.mean(X[int(NUM_DATAPTS/K):2*int(NUM_DATAPTS/K)])
+
+    X[:int(NUM_DATAPTS/K)] = np.einsum('nj, ij -> ni',
+                                       X[:int(NUM_DATAPTS/K)] - mean1, g1) + mean1
+    X[int(NUM_DATAPTS/K):2*int(NUM_DATAPTS/K)] = np.einsum('nj, ij -> ni',
+                                                          X[int(NUM_DATAPTS/K):2*int(NUM_DATAPTS/K)] - mean2,
+                                                           g2) + mean2
+    X[:,1] -= 4
+
+    MEANS, COVARIANCES, CLUSTER_COEFFICIENTS = initialize(X)
+
+    gamma = EM_clustering(X, display=True)
+    y_pred = predict(gamma)
+    print(y_pred)
+    plot_result(X, gamma)

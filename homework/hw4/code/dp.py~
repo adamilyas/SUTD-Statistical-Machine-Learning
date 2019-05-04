@@ -1,0 +1,12 @@
+import numpy as np
+from sklearn import decomposition, datasets
+import matplotlib.pyplot as plt
+import pandas as pd
+from sklearn.preprocessing import scale
+from sklearn.decomposition import PCA
+
+U, S, Vt = np.linalg.svd(scale(X))
+print("Singular val.")
+print(S)
+print("V matrix")
+print(V.t)
