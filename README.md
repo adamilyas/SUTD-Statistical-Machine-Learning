@@ -5,20 +5,22 @@ Credits to Joel Huang for 01.112 Machine Learning, Lin Geng and Ryann Sim for KN
 ## Notes
 Slides contains a whole lot of error please check textbook: Pattern Recognition and Machine Learning by Christopher Bishop*
 
-Study tips: Try doing homework by yourself and find the answers online. Some of the questions are found in the textbook too. I only went 2 lesson (First lesson and gaussian) but I studied straight from the textbook. Use the textbook to understand the slides properly. Use the slides as a guide to which part of the textbook you have to learn.
+Study tips: Try doing homework by yourself and find the answers online. Some of the questions are found in the textbook too. I only went 2 lesson (First lesson and gaussian) but I studied straight from the textbook. Use the textbook to understand the slides properly. Use the slides as a guide to which part of the textbook you have to study from.
+
+Don't over study. Check with the profs if certain sections is necessary.
 
 **Plagiarism ALERT**
 
-Dont trust people. Keep your 'homework discussion group' small. Nengli deducted a good 8 to 10 percent for plagiarism cases. Code is very easy to detect plagiarism. At least change your variable names (I look down on people who do this haha but it works.)
+Don't trust people. Keep your 'homework discussion group' small. Nengli deducted a good 8 to 10 percent for each plagiarism case. The code submissions is especially easy to detect plagiarism. At least change your variable names if you copied from for your friends.
 
-Early on I did the homework and consulted lin geng and ryann sim, the 2 GODS of ESD and I am honours to know them.
+Early on I did the homework and would consult lin geng and ryann sim, the 2 GODS of ESD and I am honoured to know them.
 
 ## Should I take this course?
 This course is very mathy. And people hate that they have to dig up stuff online and hunt for answers. There are no LABS so the only code is maybe 1 or 2 questions of the homework.
 
-I don't go for lectures so I don't have much opinions about the instructors but what I heard is the adjunct prof that is teaching the night class is WAY better than Nengli, so much so that people migrated from the afternoon to evening class (6.30 to 8.30pm) just because of the instructor.
+I don't go for lectures so I don't have much opinions about the instructors but what I heard is the adjunct prof that is teaching the night class is WAY better than Nengli, so much so that people migrated from the afternoon to evening class (6.30pm to 8.30pm) just because of the instructor.
 
-I am in ESD so this is my only machine learning. I enjoyed learning it because im a nErD.
+I am in ESD so this is my only machine learning. I enjoyed learning it because I'm a `nErD`.
 
 ## Content
 | Week  | Topic  | Assignment |
